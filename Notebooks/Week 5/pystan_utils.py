@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from pystan.external.pymc import plots
+from scipy.stats import kde
 import sys
 
 if sys.version_info[0] == 3:
@@ -13,7 +14,7 @@ def vb_extract(fit):
     
     samples_dict = {}
     means_dict = {}
-    for i in xrange(len(var_names)):
+    for i in xrange(len(var_names)-1):
         samples_dict[var_names[i]] = samples[i,:]
         means_dict[var_names[i]] = fit["mean_pars"][i]
         
@@ -26,7 +27,8 @@ def vb_extract_variable(fit, var_name, var_type="real", dims=None):
     elif var_type == "vector":
         vec = []
         for i in xrange(len(fit["sampler_param_names"])):
-            if var_name+"." in fit["sampler_param_names"][i]:
+            #if var_name+"." in fit["sampler_param_names"][i]:
+            if var_name in fit["sampler_param_names"][i]:
                 vec.append(fit["mean_pars"][i])
         return np.array(vec)
     elif var_type == "matrix":
@@ -35,7 +37,8 @@ def vb_extract_variable(fit, var_name, var_type="real", dims=None):
         C, D = dims
         mat = []
         for i in xrange(len(fit["sampler_param_names"])):
-            if var_name+"." in fit["sampler_param_names"][i]:
+            #if var_name+"." in fit["sampler_param_names"][i]:
+            if var_name in fit["sampler_param_names"][i]:
                 mat.append(fit["mean_pars"][i])
         mat = np.array(mat).reshape(C, D, order='F')
         return mat
@@ -54,7 +57,7 @@ def vb_plot_variables(fit, var_names):
     to_plot = []
     for var in var_names:
         for i in xrange(len(fit["sampler_param_names"])):
-            if var == fit["sampler_param_names"][i] or var+"." in fit["sampler_param_names"][i]: 
+            if var in fit["sampler_param_names"][i]: 
                 to_plot.append(fit["sampler_param_names"][i])
 
     for var in to_plot:
@@ -62,6 +65,16 @@ def vb_plot_variables(fit, var_names):
     plt.legend(to_plot)
     plt.show()
 
+
+def plot_kde(samples):
+    plots.kdeplot_op(plt, samples)
+
+
+def posterior_mode(samples):
+	density = kde.gaussian_kde(samples)
+	xs = np.linspace(np.min(samples),np.max(samples),1000)
+	return xs[np.argmax([density.pdf(x) for x in xs])]
+	    
 
 def report(fit, prefix=''):
     for param in fit['sampler_param_names']:

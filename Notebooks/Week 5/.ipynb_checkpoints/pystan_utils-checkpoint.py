@@ -14,7 +14,7 @@ def vb_extract(fit):
     
     samples_dict = {}
     means_dict = {}
-    for i in xrange(len(var_names)):
+    for i in xrange(len(var_names)-1):
         samples_dict[var_names[i]] = samples[i,:]
         means_dict[var_names[i]] = fit["mean_pars"][i]
         
@@ -57,7 +57,7 @@ def vb_plot_variables(fit, var_names):
     to_plot = []
     for var in var_names:
         for i in xrange(len(fit["sampler_param_names"])):
-            if var == fit["sampler_param_names"][i] or var+"." in fit["sampler_param_names"][i]: 
+            if var in fit["sampler_param_names"][i]: 
                 to_plot.append(fit["sampler_param_names"][i])
 
     for var in to_plot:
