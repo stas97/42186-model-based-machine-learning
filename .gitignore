@@ -1,2 +1,8 @@
 .ipynb_checkpoints
-__pycache__
+__pycache_
+args.txt
+inits.txt
+mean_par_names.txt
+mean_pars.txt
+sampler_param_names.txt
+samplerparams.txt
